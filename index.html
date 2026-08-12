@@ -40,7 +40,7 @@
         }
         textarea {
             width: 100%;
-            height: 100px;
+            height: 120px;
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
@@ -52,22 +52,15 @@
         button {
             background-color: #4CAF50;
             color: white;
-            padding: 12px;
+            padding: 14px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.3s;
-            margin-bottom: 15px;
         }
         button:hover {
             background-color: #45a049;
-        }
-        #outputText {
-            background-color: #f9f9f9;
-            color: #333;
-            direction: ltr;
-            text-align: left;
         }
     </style>
 </head>
@@ -77,36 +70,21 @@
         <h2>وەرگێڕی کوردی - ئەڵمانی</h2>
         <div class="author">By: ZicoAghaDizayee</div>
         <textarea id="inputText" placeholder="دەق بە کوردی لێرە بنووسە..."></textarea>
-        <button onclick="translateText()">وەرگێڕان</button>
-        <textarea id="outputText" placeholder="Übersetzung hier..." readonly></textarea>
+        <button onclick="openGoogleTranslate()">وەربگێڕە لە ڕێگەی گووگڵ</button>
     </div>
 
     <script>
-        async function translateText() {
+        function openGoogleTranslate() {
             const text = document.getElementById('inputText').value.trim();
-            const outputField = document.getElementById('outputText');
             
             if (!text) {
-                outputField.value = "تکایە دەقێک بنووسە!";
+                alert("تکایە دەقێک بنووسە!");
                 return;
             }
 
-            outputField.value = "چاوەڕوان بە...";
-
-            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ku|de`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data && data.responseData && data.responseData.translatedText) {
-                    outputField.value = data.responseData.translatedText;
-                } else {
-                    outputField.value = "هەڵەیەک ڕوویدا لە وەرگێڕان.";
-                }
-            } catch (error) {
-                outputField.value = "کێشە لە پەیوەندی ئینتەرنێت هەیە.";
-            }
+            // کردنەوەی ڕاستەوخۆی گووگڵ ترەنسڵات بە دەقەکەی تۆوە بە بێ کێشە
+            const googleUrl = `https://translate.google.com/?sl=ku&tl=de&text=${encodeURIComponent(text)}&op=translate`;
+            window.open(googleUrl, '_blank');
         }
     </script>
 
