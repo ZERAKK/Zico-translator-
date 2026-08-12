@@ -6,8 +6,8 @@
     <title>وەرگێڕی کوردی بۆ ئەڵمانی - ZicoAghaDizayee</title>
     <style>
         body {
-            font-family: Tahoma, sans-serif;
-            background-color: #f2f2f2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -18,73 +18,164 @@
         }
         .container {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             display: flex;
             flex-direction: column;
+            box-sizing: border-box;
         }
         h2 {
             text-align: center;
-            color: #333;
+            color: #2c3e50;
             margin-bottom: 5px;
+            font-size: 22px;
         }
         .author {
             text-align: center;
-            color: #666;
-            font-size: 14px;
+            color: #7f8c8d;
+            font-size: 13px;
             margin-bottom: 20px;
             font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        label {
+            font-size: 14px;
+            color: #34495e;
+            margin-bottom: 6px;
+            font-weight: 600;
         }
         textarea {
             width: 100%;
-            height: 120px;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            height: 90px;
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #dcdde1;
+            border-radius: 8px;
             resize: none;
             box-sizing: border-box;
             margin-bottom: 15px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        textarea:focus {
+            border-color: #4cd137;
+        }
+        #outputText {
+            background-color: #f8f9fa;
+            color: #2f3640;
+            direction: ltr;
+            text-align: left;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
         }
         button {
-            background-color: #4CAF50;
+            flex: 1;
+            background-color: #4cd137;
             color: white;
-            padding: 14px;
-            font-size: 16px;
+            padding: 12px;
+            font-size: 15px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.3s;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.1s;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #44bd32;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .copy-btn {
+            background-color: #fbc531;
+        }
+        .copy-btn:hover {
+            background-color: #e1b12c;
+        }
+        .status {
+            text-align: center;
+            font-size: 13px;
+            color: #e84118;
+            margin-top: 8px;
+            min-height: 18px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>وەرگێڕی کوردی - ئەڵمانی</h2>
+        <h2>وەرگێڕی کوردی بۆ ئەڵمانی</h2>
         <div class="author">By: ZicoAghaDizayee</div>
-        <textarea id="inputText" placeholder="دەق بە کوردی لێرە بنووسە..."></textarea>
-        <button onclick="openGoogleTranslate()">وەربگێڕە لە ڕێگەی گووگڵ</button>
+
+        <label for="inputText">دەقی کوردی (سۆرانی):</label>
+        <textarea id="inputText" placeholder="لێرە دەق بنووسە..."></textarea>
+
+        <div class="btn-group">
+            <button onclick="translateText()">وەربگێڕە</button>
+            <button class="copy-btn" onclick="copyResult()">کۆپیکردن</button>
+        </div>
+
+        <label for="outputText" style="margin-top: 15px;">وەرگێڕانی ئەڵمانی:</label>
+        <textarea id="outputText" placeholder="Übersetzung..." readonly></textarea>
+        
+        <div id="statusMsg" class="status"></div>
     </div>
 
     <script>
-        function openGoogleTranslate() {
+        async function translateText() {
             const text = document.getElementById('inputText').value.trim();
+            const outputField = document.getElementById('outputText');
+            const statusMsg = document.getElementById('statusMsg');
             
             if (!text) {
-                alert("تکایە دەقێک بنووسە!");
+                statusMsg.textContent = "تکایە سەرەتا دەقێک بنووسە!";
+                outputField.value = "";
                 return;
             }
 
-            // کردنەوەی ڕاستەوخۆی گووگڵ ترەنسڵات بە دەقەکەی تۆوە بە بێ کێشە
-            const googleUrl = `https://translate.google.com/?sl=ku&tl=de&text=${encodeURIComponent(text)}&op=translate`;
-            window.open(googleUrl, '_blank');
+            statusMsg.textContent = "چاوەڕوان بە، وەرگێڕان ئەنجام دەدرێت...";
+            outputField.value = "";
+
+            try {
+                // بەکارهێنانی سیستەمی مۆدێرنی وەرگێڕانی پاک
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ku|de`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data && data.responseData && data.responseData.translatedText) {
+                    outputField.value = data.responseData.translatedText;
+                    statusMsg.textContent = "";
+                } else {
+                    statusMsg.textContent = "هەڵەیەک ڕوویدا، دووبارە هەوڵ بدەرەوە.";
+                }
+            } catch (error) {
+                statusMsg.textContent = "کێشە لە پەیوەندی ئینتەرنێت هەیە.";
+            }
+        }
+
+        function copyResult() {
+            const outputField = document.getElementById('outputText');
+            const statusMsg = document.getElementById('statusMsg');
+            
+            if (!outputField.value) {
+                statusMsg.textContent = "هیچ دەقێک نییە بۆ کۆپیکردن!";
+                return;
+            }
+
+            navigator.clipboard.writeText(outputField.value);
+            statusMsg.style.color = "#4cd137";
+            statusMsg.textContent = "دەقەکە کۆپیکرا بۆ حافظە!";
+            
+            setTimeout(() => {
+                statusMsg.textContent = "";
+                statusMsg.style.color = "#e84118";
+            }, 2500);
         }
     </script>
 
